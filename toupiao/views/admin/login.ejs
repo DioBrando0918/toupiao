@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>優秀人物投票評選管理系統 - 登入</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .sys-title{
+            color: #fff;
+            font-size: 25px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class = "main">
+        <div class = "mainin">
+            <div class = sys-title>
+                優秀人物投票評選管理系統
+            </div>
+            <form action="/admin/user/login" method="post" class = "mainin1">
+                <ul>
+                    <li>
+                        <input type="text" name="username" value="admin" autocomplete="off" placeholder="使用者名稱" class = "SearchKeyword">
+                    </li>
+
+                    <li>
+                        <input type="text" name = "password" value = "admin" autocomplete="off" placeholder="密碼" class = "SearchKeyword2">
+                    </li>
+
+                    <li>
+                        <button class = "tijiao">登入</button>
+                    </li>
+
+                    <li style="color: red">
+                        <%=msg %>
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
