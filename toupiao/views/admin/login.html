@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>優秀人物投票評選管理系統 - 登入</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="../../public/css/style.css">
     <style>
         .sys-title{
             color: #fff;
@@ -39,6 +39,15 @@
                     </li>
                 </ul>
             </form>
+        </div>
+        <img src="/images/loading.gif" alt="" id = "loading" style="display: none;position: absolute">
+        <div id = 'POPLoading' class = "cssPOPLoading">
+            <div style = "height: 110px;border-bottom: 1px solid #9a9a9a">
+                <div class = "showMessage"></div>
+            </div>
+            <div style = "line-height: 40px;font-size: 14px; letter-spacing: 1px">
+                <a onclick="puc()">確定</a>
+            </div>
         </div>
     </div>
 </body>

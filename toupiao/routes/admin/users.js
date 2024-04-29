@@ -32,4 +32,15 @@ router.get('/exit',function (req, res, next){
     res.redirect('admin/login');
 });
 
+//查詢所有使用者
+router.post('/findall',function (req,res,next){
+    let {page,pageSize} = req.body;
+    ctl.findAll(model.User,page,pageSize,null,null,res);
+})
+
+//增加使用者
+router.post('/del',function (req,res,next){
+    let {id} = req.body;
+});
+
 module.exports = router;

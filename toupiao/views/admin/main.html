@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale = 1,maximum-scale = 1">
+    <link rel="stylesheet" href="../../public/layui/css/layui.css">
+    <title>優秀人物投票評選管理系統</title>
+    <style>
+        .main-body{
+            position: absolute;
+            width: 97%;
+            height: 95%;
+            border: 0;
+        }
+    </style>
+</head>
+<body class = "layui-layout-body">
+<div class = "layui-layout layui-layout-admin">
+    <div class = "layui-header">
+        <div class = "layui-logo" style="color: #fff;font-weight: bold">
+            優秀人物投票評選管理系統
+        </div>
+
+        <ul class = "layui-nav layui-layout-right">
+            <li class = "layui-nav-item">
+        <span style="cursor: pointer">
+            <%=username%>
+        </span>
+            </li>
+            <li class = "layui-nav-item">
+                <a href="/admin/user/exit">退出系統</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class = "layui-side layui-bg-black">
+        <div class = "layui-side-scroll">
+            <ul class = "layui-nav layui-nav-tree" lay-filter="test">
+                <li class = "layui-nav-item">
+                    <a href="/page/admin/count" target="main">投票統計</a>
+                </li>
+
+                <li class = "layui-nav-item">
+                    <a href="/page/admin/flowpath" target="main">投票環節管理</a>
+                </li>
+
+                <li class = "layui-nav-item layui-nav-itemed">
+                    <a href="javascript:;">候選物件管理</a>
+                    <dl class = "layui-nav-child">
+                        <dd>
+                            <a href="/page/admin/person/add" target="main">增加候選物件</a>
+                        </dd>
+                        <dd>
+                            <a href="/page/admin/person/list" target="main">所有候選物件</a>
+                        </dd>
+                    </dl>
+                </li>
+
+                <li class = "layui-nav-item layui-nav-itemed">
+                    <a href="javascript:;">投票主題管理</a>
+                    <dl class = "layui-nav-child">
+                        <dd><a href="/page/admin/vote/add" target = "main">增加新主題</a></dd>
+                        <dd><a href="/page/admin/vote/list" target="main">所有主題</a></dd>
+                    </dl>
+                </li>
+
+                <li class = "layui-nav-item layui-nav-itemed">
+                    <a href="javascript:;">使用者管理</a>
+                    <dl class = "layui-nav-child">
+                        <dd><a href="/page/admin/user/add" target = "main">增加使用者</a></dd>
+                        <dd><a href="/page/admin/user/list" target = "main">所有使用者</a></dd>
+                    </dl>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+
+    <div class = "layui-body">
+        <!--內容主題區域-->
+        <div style = "padding: 15px">
+            <iframe src="/page/admin/count" name = "main" class = "main-body"></iframe>
+        </div>
+    </div>
+</div>
+
+<script src = "/layui/layui.js"></script>
+<script>
+    layui.use('element',function(){
+        var element = layui.element;
+    });
+</script>
+
+</body>
+</html>
