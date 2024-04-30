@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name = "viewport" content="width = device-width,initial-scale = 1">
+    <link rel="stylesheet" href="../../public/layui/css/layui.css">
+    <title>Title</title>
+    <style>
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <fieldset class = "layui-elem-field layui-field-title" style = "margin-top: 30px">
+        <legend>修改使用者</legend>
+    </fieldset>
+    <div id = "app" v-cloak>
+
+        <div class = "layui-form-item">
+            <label class = "layui-form-label">使用者名稱</label>
+            <div class = "layui-input-inline">
+                <input type="text" v-model="username" autocomplete="off" placeholder="請輸入使用者名稱" class = "layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class = "layui-form-label">密碼</label>
+            <div class = "layui-input-inline">
+                <input type="password" v-model = "password" placeholder="請輸入密碼" autocomplete="off" class = "layui-input">
+            </div>
+        </div>
+
+        <div class = "layui-form-item">
+            <div class = "layui-input-block">
+                <button class = "layui-btn" onclick = "submit">立即修改</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../../public/js/vue.min.js"></script>
+    <script src="../../public/js/jquery-3.7.1.js"></script>
+    <script src="../../public/layer/layer.js"></script>
+    <script src="../../public/layui/layui.js"></script>
+
+    <script>
+        new Vue({
+            el:"#app",
+            data:{
+                id:'',
+                username:'',
+                password:''
+            },
+            created(){
+                let user = sessionStorage.user;
+                if (user){
+                    let userObj = JSON.parse(user);
+                    this.username = userObj.username;
+                    this.password = userObj.password;
+                    this.id = userObj._id;
+                }else{
+                    location.href = "/page/admin/user/list"
+                }
+            },
+            methods:{
+                submit() {
+                    if (this.username === ''){
+                        layer.msg('使用者名稱不能為空',function(){
+                            return;
+                        });
+                    }
+                    if (this.password === ''){
+                        layer.msg('密碼不能為空',function (){
+                            return;
+                        });
+                    }
+
+                    var _this = this;
+                    $.post('/admin/user/update',{
+                        id:this.id,
+                        username:this.username,
+                        password:this.password
+                    },function(res){
+                        if (res.code === 200){
+                            layer.msg('修改成功',{icon:1});
+                        }else{
+                            layer.msg('修改失敗',{icon: 2});
+                        }
+                    });
+                }
+            }
+        })
+    </script>
+
+</body>
+</html>

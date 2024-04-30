@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width = device-width,initial-scale = 1">
+    <link rel="stylesheet" href="../../public/layui/css/layui.css">
+    <title>Title</title>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px">
+    <legend>所有使用者</legend>
+</fieldset>
+<div id="app" v-cloak="">
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th>使用者名稱</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="item in list" :key="item.id">
+            <td>{{item.username}}}</td>
+            <td>
+                <button class="layui-btn layui-btn-normal layui-btn-xs" onclick="update(item)">修改</button>
+                <button class="layui-btn layui-btn-danger layui-btn-xs" onclick="del(item.username,item._id)"></button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div id="page"></div>
+</div>
+
+<script src="../../public/js/vue.min.js"></script>
+<script src="../../public/js/jquery-3.7.1.js"></script>
+<script src="../../public/layer/layer.js"></script>
+<script src="../../public/layui/layui.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            count: 0,
+            pageSize: 10,
+            page: 10,
+            totalPage: 0,
+            list: [],
+            laypage: {}
+        },
+        created() {
+            this.getData();
+        },
+        mounted() {
+            var _this = this;
+            layui.use('[laypage]', function () {
+                laypage = layui.laypage;
+                laypage.render({
+                    elem: 'page',
+                    count: _this.count, //資料總數
+                    limit: _this.pageSize,//每頁筆數
+                    curr: _this.page,//當前頁碼
+                    jump: function (obj, first) {
+                        if (!first) {
+                            _this.page = obj.curr;
+                            _this.getData();
+                        }
+                    }
+                })
+            });
+        },
+        methods: {
+            getData() {
+                var _this = this;
+                $.post('/admin/user/findall', {
+                    page: this.page,
+                    pageSize: this.pageSize
+                },function (res){
+                    _this.list = res.data;
+                    _this.page = res.page;
+                    _this.pageSize = res.pageSize;
+                    _this.count = res.count;
+                    _this.totalPage = Math.ceil(_this.count/_this.pageSize)
+                })
+            },
+            del(name,id){
+                var _this = this;
+                layer.confirm(`確定要刪除${name}嗎?`,{
+                    btn:['刪除','取消']
+                },function (){
+                    $.post('/admin/user/del',{
+                        id:id
+                    },function (res){
+                        if (res.code === 200){
+                            _this.getData();
+                            layer.msg('刪除成功');
+                        }else{
+                            layer.msg('刪除失敗',{icon:2});
+                        }
+                    })
+                })
+            },
+            update(user){
+                sessionStorage.user = JSON.stringify(user);
+                location.href = "/page/admin/user/update"
+            }
+        }
+    })
+</script>
+
+</body>
+</html>
