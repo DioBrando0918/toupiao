@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width = device-width">
+    <link rel="stylesheet" href="../../public/layui/css/layui.css">
+    <title>增加新主題</title>
+    <style>
+        .person-ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .person-li {
+            float: left;
+            margin: 10px;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px">
+    <legend>增加新主題</legend>
+</fieldset>
+
+<div id="app" v-cloak>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">投票主題</label>
+        <div class="layui-input-block">
+            <input type="text" v-model.trim="title" autocomplete="off" placeholder="請輸入使用者名稱"
+                   class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">主題介紹</label>
+        <div class="layui-input-block">
+            <input type="text" v-model.trim="title" autocomplete="off" placeholder="請輸入使用者名稱"
+                   class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">候選物件</label>
+        <div class="layui-input-block">
+            <ul class="person-ul">
+                <li class="person-li" v-for="item in personList" :key="item._id">
+                    <input type="checkbox" v-model="persons" :value="item">
+                    {{item.name}}
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">開始時間</label>
+            <div class="layui-input-inline">
+                <input type="text" id="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-inline">
+            <label class="layui-form-label">結束時間</label>
+            <div class="layui-input-inline">
+                <input type="text" id="date2" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" @click="submit">立即提交</button>
+        </div>
+    </div>
+</div>
+
+<script src="../../public/js/vue.min.js"></script>
+<script src="../../public/js/jquery-3.7.1.js"></script>
+<script src="../../public/layer/layer.js"></script>
+<script src="../../public/layui/layui.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            startDate: '',
+            endDate: '',
+            title: '',
+            desc: '',
+            persons: '',
+            personList: ''
+        },
+        created() {
+            var _this = this;
+            $.post('/admin/person/queryall', function (res) {
+                _this.personList = res.list;
+            });
+        },
+        mounted() {
+            var _this = this;
+            layui.use(['form', 'laydate'], function () {
+                var form = layui.form;
+                var laydate = layui.laydate;
+
+                //日期
+                laydate.render({
+                    elem: '#date',
+                    type: 'datetime',
+                    format: 'yyyy-MM-dd HH:mm:ss'
+                });
+
+                laydate.render({
+                    elem: '#date',
+                    type: 'datetime',
+                    format: 'yyyy-MM-dd HH:mm:ss'
+                })
+            })
+        },
+        methods: {
+            submit() {
+                let date = document.getElementById('date');
+                let date2 = document.getElementById('date2');
+
+                if (this.title === '') {
+                    layer.msg('主題不能為空', function () {
+                    });
+                    return;
+                }
+
+                if (this.desc === '') {
+                    layer.msg('主題介紹不能為空', function () {
+                    });
+                    return;
+                }
+
+                if (date.value.trim() === '') {
+                    layer.msg('開始時間不能為空', function () {
+                    });
+                    return;
+                }
+
+                if (date2.value.trim() === '') {
+                    layer.msg('結束時間不能為空', function () {
+                    });
+                    return;
+                }
+
+                if (this.person.length <= 0) {
+                    layer.msg('候選物件不能為空', function () {
+                    });
+                    return;
+                }
+
+                var _this = this;
+                $.post('/admin/vote/add', {
+                    title: this.title,
+                    desc: this.desc,
+                    startDate: date.value,
+                    endDate: date2.value,
+                    persons: JSON.stringify(this.persons)
+                }, function (res) {
+                    if (res.code === 200) {
+                        layer.msg('增加成功', {icons: 1});
+                        _this.title = '';
+                        _this.desc = '';
+                        date.value = '';
+                        date2.value = '';
+                        _this.persons = [];
+                    }else{
+                        layer.msg('增加失敗',{icons:2});
+                    }
+                })
+            }
+        }
+    });
+</script>
+</body>
+</html>

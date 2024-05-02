@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width = device-width,initial-scale = 1">
     <link rel="stylesheet" href="../../public/layui/css/layui.css">
-    <title>Title</title>
+    <title>所有候選物件</title>
     <style>
         [v-cloak] {
             display: none;
@@ -13,26 +13,34 @@
 </head>
 <body>
 <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px">
-    <legend>所有使用者</legend>
+    <legend>所有候選物件</legend>
 </fieldset>
-<div id="app" v-cloak="">
+
+<div id="add" v-cloak>
     <table class="layui-table">
         <thead>
         <tr>
-            <th>使用者名稱</th>
+            <th>照片</th>
+            <th>姓名</th>
+            <th>個人簡介</th>
             <th>操作</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="item in list" :key="item.id">
-            <td>{{item.username}}}</td>
+        <tr v-for="item in list" :key="item._id">
             <td>
-                <button class="layui-btn layui-btn-normal layui-btn-xs" onclick="update(item)">修改</button>
-                <button class="layui-btn layui-btn-danger layui-btn-xs" onclick="del(item.username,item._id)"></button>
+                <img :src="item.photo" width="80px" height="80px">
+            </td>
+            <td>{{item.name}}</td>
+            <td>{{item.desc}}</td>
+            <td>
+                <button class="layui-btn layui-btn-normal layui-btn-xs" @click="update(item)">修改</button>
+                <button class="layui-btn layui-btn-normal layui-btn-xs" @click="del(item)">刪除</button>
             </td>
         </tr>
         </tbody>
     </table>
+
     <div id="page"></div>
 </div>
 
@@ -43,60 +51,57 @@
 
 <script>
     var vm = new Vue({
-        el: "#app",
-        data: {
-            count: 0,
-            pageSize: 10,
-            page: 10,
-            totalPage: 0,
-            list: [],
-            laypage: {}
+        el:"#app",
+        data:{
+            count:0,
+            pageSize:10,
+            page:1,
+            totalPage:0,
+            list:[],
+            laypage:{}
         },
-        created() {
+        created(){
             this.getData();
         },
-        mounted() {
+        mounted(){
             var _this = this;
-            layui.use('[laypage]', function () {
+            layui.use(['laypage'],function (){
                 laypage = layui.laypage;
                 laypage.render({
-                    elem: 'page',
-                    count: _this.count, //資料總數
-                    limit: _this.pageSize,//每頁筆數
-                    curr: _this.page,//當前頁碼
-                    jump: function (obj, first) {
-                        if (!first) {
+                    elem:'page',
+                    count: _this.count,
+                    limit:_this.limit,
+                    curr:_this.page,
+                    jump:function(obj,first){
+                        if (!first){
                             _this.page = obj.curr;
                             _this.getData();
                         }
                     }
-                })
+                });
             });
-        },
-        methods: {
-            getData() {
+        },methods:{
+            getData(){
                 var _this = this;
-                $.post('/admin/user/findall', {
-                    page: this.page,
-                    pageSize: this.pageSize
+                $.post('/admin/person/findall',{
+                    page:this.page,
+                    pageSize:this.pageSize
                 },function (res){
                     _this.list = res.data;
                     _this.page = res.page;
                     _this.pageSize = res.pageSize;
                     _this.count = res.count;
-                    _this.totalPage = Math.ceil(_this.count/_this.pageSize)
+                    _this.totalPage = Math.ceil(_this.count/_this.pageSize);
                 })
             },
             del(name,id){
                 var _this = this;
                 layer.confirm(`確定要刪除${name}嗎?`,{
-                    btn:['刪除','取消']
-                },function (){
-                    $.post('/admin/user/del',{
-                        id:id
-                    },function (res){
+                    btn:['確定','取消']
+                },function(){
+                    $.post('/admin/person/del',{id:id},function(res){
                         if (res.code === 200){
-                            _this.getData();
+                            this.getData();
                             layer.msg('刪除成功');
                         }else{
                             layer.msg('刪除失敗',{icon:2});
@@ -104,12 +109,12 @@
                     })
                 })
             },
-            update(user){
-                sessionStorage.user = JSON.stringify(user);
-                location.href = "/page/admin/user/update"
+            update(person){
+                sessionStorage.person = JSON.stringify(person);
+                location.href = '/page/admin/person/update';
             }
         }
-    })
+    });
 </script>
 
 </body>

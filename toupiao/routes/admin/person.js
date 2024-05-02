@@ -20,4 +20,20 @@ router.post('/findall',function (req, res, next){
 });
 
 //查詢所有候選物件(不分頁)
-router.post('/queryall')
+router.post('/queryall',function(req, res, next){
+    ctl.find(model.Person,{},res);
+});
+
+//刪除候選物件
+router.post('/del',function (req, res, next){
+    let {id} = req.body;
+    ctl.del(model.Person,{_id:id},res);
+});
+
+//修改候選物件
+router.post('/update',function (req, res, next){
+   let {id,name,photo,desc} = req.body;
+   ctl.update(model.Person,{_id:id},{name,photo,desc},res);
+});
+
+module.exports = router;

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width = device-width,initial-scale = 1">
+    <link rel="stylesheet" href="../../public/layui/css/layui.css">
+    <title>修改候選物件</title>
+    <style>
+        .upload-img {
+            width: 150px;
+            height: 150px;
+            border: 1px solid #cccccc;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px">
+    <legend>修改候選物件</legend>
+</fieldset>
+<div id="app" v-cloak>
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-inline">
+            <input type="text" v-model.trim="name" autocomplete="off" placeholder="請輸入使用者名稱"
+                   class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">照片</label>
+        <div class="layui-input-inline layui-upload">
+            <button type="button" class="layui-btn" id="test1">上傳圖片</button>
+            <div class="layui-upload-list">
+                <img v-show="imgurl != ''" class="upload-img" :src="imgurl">
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">個人介紹</label>
+        <div class="layui-input-block">
+            <textarea v-model.trim="desc" placeholder="請輸入內容" class="layui-textarea"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" @click="submit">立即修改</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="../../public/js/vue.min.js"></script>
+<script src="../../public/js/jquery-3.7.1.js"></script>
+<script src="../../public/layer/layer.js"></script>
+<script src="../../public/layui/layui.js"></script>
+
+<script>
+    new Vue({
+        el:"#app",
+        data:{
+            id:'',
+            name:'',
+            imgurl:'',
+            desc:''
+        },
+        created(){
+            let person = sessionStorage.person;
+            if (person){
+                person = JSON.parse(person);
+                this.name = person.name;
+                this.imgurl = person.photo;
+                this.desc = person.desc;
+                this.id = person._id;
+            }
+        },
+        mounted(){
+            var _this = this;
+            layui.use('upload',function(){
+                var upload = layui.upload;
+
+                var uploadInst = upload.render({
+                    elem:'#test1',
+                    url:'/upload/file',
+                    done:function(res){
+                        _this.imgurl = res.imgurl;
+                    },
+                    error:function(){
+                        layer.msg('照片上傳失效',function(){});
+                    }
+                });
+            });
+        },
+        methods:{
+            submit(){
+                if (this.name === ''){
+                    layer.msg('姓名不能為空',function(){});
+                    return;
+                }
+                if (this.imgurl === ''){
+                    layer.msg('照片不能為空',function(){});
+                    return;
+                }
+                if (this.desc === ''){
+                    layer.msg('個人介紹不能為空',function(){});
+                    return;
+                }
+
+                var _this = this;
+                $.post('/admin/person/update',{
+                    id:this.id,
+                    name:this.name,
+                    photo:this.imgurl,
+                    desc:this.desc
+                },function(res){
+                    if (res.code === 200){
+                        layer.msg('修改成功',{icon:1});
+                    }else{
+                        layer.msg('修改失敗',{icon:2});
+                    }
+                });
+            }
+        }
+    });
+</script>
+</body>
+</html>
