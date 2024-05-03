@@ -1,11 +1,123 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width = device-width,initial-scale = 1">
+    <title>優秀人物投票評選系統</title>
+    <link rel='stylesheet' href='../public/css/index.css'/>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <div class="header">
+        <div class="header-title">優秀人物投票評選系統</div>
+        <div class="header-nav">
+            <div class="nav-top">
+                <div>
+                    投票主題:
+                    <select @change="changeVote">
+                        <option v-for="item in votes" :key="item._id" :value="item._id">
+                            {{item.title}}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="date-text">
+                    投票時間:{{vote.startDate}} 起~ {{vote.endDate}}
+                </div>
+            </div>
+
+            <div class="header-desc">
+                <b>主題介紹:</b>
+                {{vote.desc}}
+            </div>
+
+            <div class="header-bottom">
+                <strong>候選人</strong>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <div class="person-item" v-for="item in vote.person" :key="item._id">
+            <img :src="item.photo" alt="">
+            <span>{{item.name}}</span>
+            <div>
+                <button class="layui-btn layui-btn-sm" :class="isVote" @click="handleVote(item)">投一票</button>
+                <button class="layui-btn layui-btn-sm" @click="showDetail(item)">看資料</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../public/js/vue.min.js"></script>
+<script src="../public/js/jquery-3.7.1.js"></script>
+<script src="../public/layer/layer.js"></script>
+<script src="../public/layui/layui.js"></script>
+<script src="http://pv.sohu.com/cityjson?ie=utf-8?ie=utf-8"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            ip: '',
+            address: '',
+            votes: [],
+            vote: {},
+            isVote: 'layui-btn-danger'
+        },
+        created() {
+            console.log("aaaaa");
+            this.ip = returnCitySN['cip'];
+            this.address = returnCitySN["cname"];
+            this.getData();
+        },
+        methods: {
+            getData() {
+                var _this = this;
+                $.post('/admin/vote/queryall', function (res) {
+                    _this.votes = res.list;
+                    _this.vote = _this.votes[0];
+                });
+            },
+            changeVote(e) {
+                let id = e.target.value;
+                this.votes.map(function (item) {
+                    if (item._id === id) {
+                        this.vote = item;
+                        return;
+                    }
+                });
+            },
+            handleVote(person) {
+                if (this.isVote === 'layui-btn-disable') {
+                    return;
+                }
+                var _this = this;
+                $.post('/admin/flowpath/vote', {
+                    ip: this.ip,
+                    address: this.address,
+                    vote : JSON.stringify(this.vote),
+                    person : JSON.stringify(person)
+                }, function (res) {
+                    if (res.code){
+                        layer.msg('投票成功');
+                        _this.isVote = 'layui-btn-disable';
+                    }
+                });
+            },
+            showDetail(person){
+                layer.open({
+                    title:person.name,
+                    content:'<img src = "${person.photo}" width = "200px" height = "260px">/<div><b>人物介紹</b>${person.desc}</div>'
+                });
+            }
+        }
+    });
+</script>
+
+</body>
 </html>

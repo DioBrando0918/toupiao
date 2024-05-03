@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width = device-width,initial-scale = 1">
+    <title>投票統計</title>
+    <link rel="stylesheet" href="../../public/layui/css/layui.css">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px">
+    <legend>投票統計</legend>
+</fieldset>
+
+<div id="app" v-cloak="">
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th>主題</th>
+            <th>介紹</th>
+            <th>投票開始時間</th>
+            <th>投票結束時間</th>
+            <th>投票次數</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr v-for="item in list" :key="item:_id">
+            <td>{{item.title}}</td>
+            <td>{{item.desc}}</td>
+            <td>{{item.startDate}}</td>
+            <td>{{item.endDate}}</td>
+            <td>{{item.num}}</td>
+            <td>
+                <button class="layui-btn layui-btn-normal layui-btn-xs" @click="show(item)">查看詳情</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div id="page"></div>
+</div>
+
+<script src="../../public/js/vue.min.js"></script>
+<script src="../../public/js/jquery-3.7.1.js"></script>
+<script src="../../public/layer/layer.js"></script>
+<script src="../../public/layui/layui.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            count: 0,
+            pageSize: 10,
+            page:1,
+            totalPage:0,
+            list:[],
+            laypage:{}
+        },
+        created(){
+            this.getData();
+        },
+        mounted(){
+            var _this = this;
+            layui.use(['laypage'],function(){
+                laypage = layui.laypage;
+                laypage.render({
+                   elem:'#page',
+                   count:_this.count,
+                   limit:_this.pageSize,
+                   curr:_this.page,
+                   jump:function(obj,first){
+                       if (!first){
+                           _this.page = obj.curr;
+                           _this.getData();
+                       }
+                   }
+                });
+            });
+        },
+        methods:{
+            getData(){
+                var _this = this;
+                $.post('/admin/vote/findall',{
+                    page:this.page,
+                    pageSize:this.pageSize
+                },function(res){
+                    _this.list = res.data;
+                    _this.page = res.page;
+                    _this.pageSize = res.pageSize;
+                    _this.count = res.count;
+                    _this.totalPage = Math.ceil(_this.count/_this.pageSize);
+
+                    _this.list.map(function(item,index){
+                        _this.getNumber(item._id,index);
+                    });
+                });
+            },
+            getNumber(id,index){
+                var _this = this;
+                $.post('/admin/count/num',{
+                    id
+                },function(res){
+                    _this.list[index].num = res.num;
+                });
+            },
+            show(vote){
+                sessionStorage.voteData = JSON.stringify(vote);
+                window.location.href = "/page/admin/count/detail";
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

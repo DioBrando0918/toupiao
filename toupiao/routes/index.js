@@ -86,3 +86,5 @@ router.get('/page/admin/user/list',function(req, res, next){
 router.get('/page/admin/user/update',function (req, res, next){
   res.render('admin/user_update');
 });
+
+module.exports = router;

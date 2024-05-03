@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width = device-width,initial-scale = 1">
+    <link rel="stylesheet" href="../../public/layui/css/layui.css">
+    <title>投票環節</title>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px">
+    <legend>投票環節管理</legend>
+</fieldset>
+
+<div id="app" v-cloak>
+    <table class="layui-table">
+        <thead>
+            <tr>
+                <th>投票時間</th>
+                <th>網友ip</th>
+                <th>所屬地區</th>
+                <th>投票主題</th>
+                <th>投票物件</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr v-for = "item in list" :key = "item._id">
+                <td>{{item.createTime}}</td>
+                <td>{{item.ip}}</td>
+                <td>{{item.address}}</td>
+                <td>{{item.vote.title}}</td>
+                <td>{{item.person.name}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div id = "page"></div>
+</div>
+
+<script src="../../public/js/vue.min.js"></script>
+<script src="../../public/js/jquery-3.7.1.js"></script>
+<script src="../../public/layer/layer.js"></script>
+<script src="../../public/layui/layui.js"></script>
+
+<script>
+    var vm = new Vue({
+        el:'#app',
+        data:{
+            count:0,
+            pageSize:10,
+            page:1,
+            list:[],
+            laypage:{}
+        },
+        created(){
+            this.getData();
+        },
+        mounted(){
+            var _this = this;
+            layui.use(['laypage'],function(){
+                laypage = layui.laypage;
+                laypage.render({
+                    elem:'#page',
+                    count: _this.count,
+                    limit:_this.pageSize,
+                    curr:_this.page,
+                    jump:function(obj,first){
+                        if (!first){
+                            _this.page = obj.curr;
+                            _this.getData();
+                        }
+
+                    }
+                });
+            })
+        },
+        methods:{
+            getData(){
+                var _this = this;
+                $.post('/admin/flowpath/findall',{
+                    page:this.page,
+                    pageSize:this.pageSize
+                },function (res){
+                    _this.list = res.data;
+                    _this.page = res.page;
+                    _this.pageSize = res.pageSize;
+                    _this.count = res.count;
+                })
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

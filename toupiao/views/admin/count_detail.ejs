@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width = device-width,initial-scale = 1">
+    <link rel="stylesheet" href="../../public/layui/css/layui.css">
+    <title>投票統計</title>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <a href="/page/admin/count">
+        <i class="layui-icon layui-icon-prev"></i>
+        傳回
+    </a>
+
+    <div id="app" v-cloak>
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px">
+            <legend>{{vote.title}}</legend>
+        </fieldset>
+
+        <table class="layui-table">
+            <thead>
+            <tr>
+                <th>姓名</th>
+                <th>投票佔比(共{{vote.num}}票)</th>
+                <th>得票數</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr v-for="item in list" :key="item:_id">
+                <td>{{item.name}}</td>
+                <td>
+                    <div class="layui-progress layui-progress-big" lay-showPercent="yes">
+                        <div class="layui-progress-bar layui-bg-green" :lay-percent="item.num.zb"></div>
+                    </div>
+                </td>
+                <td>
+                    {{item.num.personNum}}票
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div id="page"></div>
+    </div>
+</div>
+
+<script src="../../public/js/vue.min.js"></script>
+<script src="../../public/js/jquery-3.7.1.js"></script>
+<script src="../../public/layer/layer.js"></script>
+<script src="../../public/layui/layui.js"></script>
+
+<script>
+    layui.use('element', function () {
+        var element = layui.element;
+    });
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            vote: {}
+        },
+        created() {
+            let vote = sessionStorage.voteData;
+            if (!vote) {
+                window.location.href = '/admin/admin/count';
+            }
+            this.vote = JSON.parse(vote);
+
+            let list = this.vote.persons.map(function (item) {
+                let num = this.getNumber(item.id);
+                num.zb = `${Math.floor(num.personNum / num.count * 100)} %`
+                item.num = num;
+                return item;
+            });
+
+            this.vote.persons = list;
+            console.log(this.vote.persons);
+        },
+        mounted() {
+
+        }, methods: {
+            getNumber(id) {
+                let num = null;
+                $.ajax({
+                    async: false,
+                    url: '/admin/count/person',
+                    type: 'POST',
+                    data: {
+                        voteid: this.vote._id,
+                        personid: id
+                    },
+                    success:function(res){
+                        num = res
+                    }
+                })
+                return num;
+            },
+            show(vote){
+
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
