@@ -142,6 +142,7 @@ function find(Entity, where, res) {
             list: rel
         });
     }).catch(function (err) {
+        console.log(err);
         res.json({
             list: []
         });

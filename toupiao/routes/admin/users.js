@@ -29,7 +29,7 @@ router.post('/login',function (req, res, next){
 
 router.get('/exit',function (req, res, next){
     req.session.destroy(function(err){});
-    res.redirect('admin/login');
+    res.redirect('/admin/login');
 });
 
 //查詢所有使用者

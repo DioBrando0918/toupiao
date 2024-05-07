@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width = device-width,initial-scale = 1">
-    <link rel="stylesheet" href="../../public/layui/css/layui.css">
+    <link rel="stylesheet" href="/layui/css/layui.css">
     <title>所有候選物件</title>
     <style>
         [v-cloak] {
@@ -17,6 +17,7 @@
 </fieldset>
 
 <div id="add" v-cloak>
+    <h1>aaaa</h1>
     <table class="layui-table">
         <thead>
         <tr>
@@ -44,10 +45,10 @@
     <div id="page"></div>
 </div>
 
-<script src="../../public/js/vue.min.js"></script>
-<script src="../../public/js/jquery-3.7.1.js"></script>
-<script src="../../public/layer/layer.js"></script>
-<script src="../../public/layui/layui.js"></script>
+<script src="/js/vue.min.js"></script>
+<script src="/js/jquery-3.7.1.js"></script>
+<script src="/layer/layer.js"></script>
+<script src="/layui/layui.js"></script>
 
 <script>
     var vm = new Vue({
@@ -64,34 +65,22 @@
             this.getData();
         },
         mounted(){
-            var _this = this;
-            layui.use(['laypage'],function (){
-                laypage = layui.laypage;
-                laypage.render({
-                    elem:'page',
-                    count: _this.count,
-                    limit:_this.limit,
-                    curr:_this.page,
-                    jump:function(obj,first){
-                        if (!first){
-                            _this.page = obj.curr;
-                            _this.getData();
-                        }
-                    }
-                });
-            });
+            this.updatePage();
         },methods:{
             getData(){
                 var _this = this;
                 $.post('/admin/person/findall',{
                     page:this.page,
                     pageSize:this.pageSize
-                },function (res){
+                }, function (res){
                     _this.list = res.data;
                     _this.page = res.page;
                     _this.pageSize = res.pageSize;
                     _this.count = res.count;
                     _this.totalPage = Math.ceil(_this.count/_this.pageSize);
+                    console.log(`count = ${_this.count}`);
+                    console.log(`limit = ${_this.pageSize}`);
+                    console.log(`curr = ${_this.page}`);
                 })
             },
             del(name,id){
@@ -112,6 +101,28 @@
             update(person){
                 sessionStorage.person = JSON.stringify(person);
                 location.href = '/page/admin/person/update';
+            },
+            updatePage(){
+                var _this = this;
+                console.log("count "+_this.count);
+                console.log('limit '+_this.pageSize);
+                console.log('curr '+_this.page);
+                layui.use(['laypage'],function (){
+                    laypage = layui.laypage;
+                    laypage.render({
+                        elem:'page',
+                        count: _this.count,
+                        limit:_this.pageSize,
+                        curr:_this.page,
+                        jump:function(obj,first){
+                            if (!first){
+                                console.log('first')
+                                _this.page = obj.curr;
+                                _this.getData();
+                            }
+                        }
+                    });
+                });
             }
         }
     });

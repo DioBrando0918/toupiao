@@ -5,6 +5,12 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var countRouter = require('./routes/admin/count');
+var flowpathRouter = require('./routes/admin/flowpath');
+var personRouter = require('./routes/admin/person');
+var userRouter = require('./routes/admin/users');
+var voteRouter = require('./routes/admin/vote');
+var uploadRouter = require('./routes/utils/upload')
 var getConnect = require('./db/connect');
 var session = require('express-session')
 
@@ -33,6 +39,12 @@ app.use(session({
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/admin/count', countRouter);
+app.use('/admin/flowpath', flowpathRouter);
+app.use('/admin/person', personRouter);
+app.use('/admin/user', userRouter);
+app.use('/admin/vote', voteRouter);
+app.use('/upload',uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
